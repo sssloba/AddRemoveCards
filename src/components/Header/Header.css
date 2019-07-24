@@ -1,0 +1,16 @@
+
+header {
+	width: 100%;
+	background: #fff;
+	box-shadow: 0 0 3px 0 rgba(0,0,0,.7);
+}
+
+header .wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+header .logo {
+	width: 70px;
+}
