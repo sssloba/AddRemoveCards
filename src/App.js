@@ -1,6 +1,8 @@
 import React, {Component, Fragment} from 'react';
 import './App.css';
+
 import data from './data/data.json';
+import uuid from 'react-uuid';
 
 import {Header} from './components/Header/Header';
 import {Cards} from './components/Cards/Cards';
@@ -13,19 +15,62 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.setData();
+  }
+
+  setData = () => {
+    const loadedData = [...data];
+
+    loadedData.forEach(item => {
+      item.id = uuid();
+    })
+    console.log(loadedData)
+
     this.setState({
-      data: data
+      data: loadedData
     })
   }
 
-  onCardRemove = (e) => {
-    console.log(e.target)    
+  onCardRemove = (id) => {
+     let newData = [...this.state.data];
+
+     newData = newData.filter(item => {
+      return item.id !== id;
+     })   
+
+     this.setState({
+      data:newData
+     })
+  }
+
+  onCardDuplicate = (id) => {
+    let newData = [...this.state.data];
+    let duplicatedCard = {...newData.find(item => item.id === id)};
+    const duplicatedCardIndex = newData.findIndex(item => item.id === id);
+
+    console.log(duplicatedCardIndex)
+
+    duplicatedCard.id = uuid();
+    duplicatedCard.name += "_copy";
+
+    newData.splice(duplicatedCardIndex + 1, 0, duplicatedCard);
+
+    this.setState({
+      data: newData,
+    })
   }
 
   renderCards = () => {
-    const displayData = this.state.searchedData || this.state.data;
+    const {data, searchedData,showCards} = this.state;
+    const displayData = searchedData || data;
 
-    return this.state.showCards ? <Cards data={displayData} removeCard={this.onCardRemove} /> : null;
+    return (
+      showCards && data.length 
+      ? <Cards data={displayData} 
+               removeCard={(id) => this.onCardRemove(id)}
+               duplicateCard={(id) => this.onCardDuplicate(id)} /> 
+      : null
+    )
   }
 
   onCardSearch = (data) => {
