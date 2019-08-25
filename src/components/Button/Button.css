@@ -6,6 +6,8 @@ button {
 	padding: 5px;
 	cursor: pointer;
 	font-size: 12px;
+	border-color: green;
+	color: green;
 }
 
 button.red {

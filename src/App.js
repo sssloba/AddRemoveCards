@@ -6,12 +6,14 @@ import uuid from 'react-uuid';
 
 import {Header} from './components/Header/Header';
 import {Cards} from './components/Cards/Cards';
+import {Form} from './components/Form/Form';
 
 class App extends Component {
 
   state = {
     showCards: true,
-    data: []
+    data: [],
+    formOpened: false
   }
 
   componentDidMount() {
@@ -24,8 +26,7 @@ class App extends Component {
     loadedData.forEach(item => {
       item.id = uuid();
     })
-    console.log(loadedData)
-
+    
     this.setState({
       data: loadedData
     })
@@ -39,16 +40,14 @@ class App extends Component {
      })   
 
      this.setState({
-      data:newData
+      data: newData
      })
   }
 
   onCardDuplicate = (id) => {
     let newData = [...this.state.data];
     let duplicatedCard = {...newData.find(item => item.id === id)};
-    const duplicatedCardIndex = newData.findIndex(item => item.id === id);
-
-    console.log(duplicatedCardIndex)
+    const duplicatedCardIndex = newData.findIndex(item => item.id === id); 
 
     duplicatedCard.id = uuid();
     duplicatedCard.name += "_copy";
@@ -60,6 +59,18 @@ class App extends Component {
     })
   }
 
+  onFormOpen = () => {
+    this.setState({
+      formOpened: true
+    })
+  }
+
+  onFormClose = () => {
+    this.setState({
+      formOpened: false
+    })
+  }
+
   renderCards = () => {
     const {data, searchedData,showCards} = this.state;
     const displayData = searchedData || data;
@@ -68,9 +79,17 @@ class App extends Component {
       showCards && data.length 
       ? <Cards data={displayData} 
                removeCard={(id) => this.onCardRemove(id)}
-               duplicateCard={(id) => this.onCardDuplicate(id)} /> 
+               duplicateCard={(id) => this.onCardDuplicate(id)}
+               openForm={this.onFormOpen} /> 
       : null
     )
+  }
+
+  renderForm = () => {
+    if (this.state.formOpened) {
+      return <Form closeForm={this.onFormClose}
+                   createCard={data => this.onCardCreate(data)} />
+    }
   }
 
   onCardSearch = (data) => {
@@ -79,17 +98,30 @@ class App extends Component {
       })
   }
 
+  onCardCreate = (item) => {
+    this.setState({
+      data: [
+        ...this.state.data,
+        item
+      ],
+      formOpened: false
+    })
+  }
+
   render() {
+    const {data} = this.state;
+
     return (
       <Fragment>
       <Header className="full-width" 
-              data={this.state.data}
+              data={data}
               onSearch={(data) => this.onCardSearch(data)}
                />
               
               
       <div className="main-content" onClick={this.update} >
         {this.renderCards()}
+        {this.renderForm()}
       </div>
       </Fragment>
     );
