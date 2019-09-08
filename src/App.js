@@ -21,26 +21,32 @@ class App extends Component {
   }
 
   setData = () => {
-    const loadedData = [...data];
 
-    loadedData.forEach(item => {
-      item.id = uuid();
+    fetch(`https://cards-b479c.firebaseio.com/people.json`)
+    .then(response => {
+      return response.json()
     })
-    
-    this.setState({
-      data: loadedData
-    })
+    .then (response => {
+      const persons = [];
+
+      for(let person in response) {
+        response[person].id = person;
+        persons.push(response[person])
+      }
+           
+      this.setState({
+        data: persons
+      })
+    })  
+
   }
 
   onCardRemove = (id) => {
-     let newData = [...this.state.data];
-
-     newData = newData.filter(item => {
-      return item.id !== id;
-     })   
-
-     this.setState({
-      data: newData
+     fetch(`https://cards-b479c.firebaseio.com/people/${id}.json`, {
+      method: "DELETE"
+     })
+     .then(response => {
+        this.setData();
      })
   }
 
@@ -76,7 +82,7 @@ class App extends Component {
     const displayData = searchedData || data;
 
     return (
-      showCards && data.length 
+      showCards
       ? <Cards data={displayData} 
                removeCard={(id) => this.onCardRemove(id)}
                duplicateCard={(id) => this.onCardDuplicate(id)}
@@ -99,11 +105,15 @@ class App extends Component {
   }
 
   onCardCreate = (item) => {
+    fetch(`https://cards-b479c.firebaseio.com/people.json`, {
+      method: "POST",
+      body: JSON.stringify(item)
+    })
+    .then(response => {
+      this.setData();
+    })
+
     this.setState({
-      data: [
-        ...this.state.data,
-        item
-      ],
       formOpened: false
     })
   }
@@ -116,10 +126,11 @@ class App extends Component {
       <Header className="full-width" 
               data={data}
               onSearch={(data) => this.onCardSearch(data)}
-               />
+             
+              />
               
               
-      <div className="main-content" onClick={this.update} >
+      <div className="main-content" onClick={this.update}>
         {this.renderCards()}
         {this.renderForm()}
       </div>
