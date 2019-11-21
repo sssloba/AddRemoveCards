@@ -9,6 +9,7 @@ import {CardsPage} from './pages/CardsPage/CardsPage';
 import {FormPage} from './pages/FormPage/FormPage';
 import CardDetailsPage from './pages/CardDetailsPage/CardDetailsPage';
 import * as actionTypes from './store/actionTypes';
+import { updateAge, updateName } from './store/actionCreators';
 
 import {connect} from 'react-redux';
 
@@ -64,8 +65,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateAge: (age) => dispatch({type: actionTypes.UPDATE_AGE, value: age}),
-    updateName: (name, lastName) => dispatch({type: actionTypes.UPDATE_NAME, value: name, lastName: lastName})
+    updateAge: (age) => dispatch(updateAge(age)),
+    updateName: (name, lastName) => dispatch(updateName(name, lastName))
   }
 }
 
